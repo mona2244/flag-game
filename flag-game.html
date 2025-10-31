@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لعبة تخمين أعلام الدول</title>
+    <style>
+        body {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100%;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0 0 20px 0;
+            color: #667eea;
+            font-size: 2.5em;
+        }
+
+        .scores {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 20px;
+        }
+
+        .team {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .team-1 {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .team-2 {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .numbers-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 10px;
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .number-btn {
+            aspect-ratio: 1;
+            border: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .number-btn:hover:not(.answered) {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .number-btn.answered {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .question-area {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            display: none;
+        }
+
+        .question-area.active {
+            display: block;
+        }
+
+        .answer-area {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            display: none;
+        }
+
+        .answer-area.active {
+            display: block;
+        }
+
+        .flag-container {
+            margin: 30px 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .flag {
+            width: 300px;
+            height: 200px;
+            border: 3px solid #333;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .team-selector {
+            margin: 30px 0;
+        }
+
+        .team-select-btn {
+            padding: 20px 40px;
+            margin: 0 15px;
+            font-size: 1.3em;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .team-select-btn.team-1-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .team-select-btn.team-2-btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .team-select-btn:hover {
+            transform: scale(1.05) translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .reveal-btn {
+            padding: 20px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.3em;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .reveal-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .answer-display {
+            font-size: 2em;
+            color: #667eea;
+            font-weight: bold;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+
+        .back-btn {
+            padding: 12px 25px;
+            background: #95a5a6;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .back-btn:hover {
+            background: #7f8c8d;
+        }
+
+        .success-message {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            background: #d4edda;
+            color: #155724;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏁 لعبة تخمين أعلام الدول 🏁</h1>
+            <div class="scores">
+                <div class="team team-1">
+                    الفريق الأول: <span id="score1">0</span>
+                </div>
+                <div class="team team-2">
+                    الفريق الثاني: <span id="score2">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- الشاشة الرئيسية -->
+        <div class="numbers-grid" id="numbersGrid"></div>
+
+        <!-- شاشة السؤال -->
+        <div class="question-area" id="questionArea">
+            <h2>السؤال رقم <span id="questionNumber"></span></h2>
+            
+            <div class="flag-container">
+                <div class="flag" id="flagDisplay"></div>
+            </div>
+            
+            <h3 style="color: #667eea; font-size: 1.5em;">ما هي هذه الدولة؟</h3>
+            
+            <button class="reveal-btn" onclick="showAnswer()">الإجابة</button>
+            <button class="back-btn" onclick="backToGrid()">العودة للقائمة</button>
+        </div>
+
+        <!-- شاشة الإجابة -->
+        <div class="answer-area" id="answerArea">
+            <h2>الإجابة للسؤال رقم <span id="answerQuestionNumber"></span></h2>
+            
+            <div class="flag-container">
+                <div class="flag" id="answerFlagDisplay"></div>
+            </div>
+            
+            <div class="answer-display">
+                <span id="answerText"></span>
+            </div>
+            
+            <div class="team-selector">
+                <p style="font-size: 1.3em; color: #667eea; font-weight: bold;">أي فريق أجاب إجابة صحيحة؟</p>
+                <button class="team-select-btn team-1-btn" onclick="givePointToTeam(1)">الفريق الأول</button>
+                <button class="team-select-btn team-2-btn" onclick="givePointToTeam(2)">الفريق الثاني</button>
+            </div>
+
+            <div class="success-message" id="successMessage"></div>
+        </div>
+    </div>
+
+    <script>
+        // قائمة الأعلام بالصور
+        const flags = [
+            { image: 'saudi.jpg', name: 'السعودية' },
+            { image: 'uae.jpg', name: 'الإمارات' },
+            { image: 'egypt.jpg', name: 'مصر' },
+            { image: 'iraq.jpg', name: 'العراق' },
+            { image: 'jordan.jpg', name: 'الأردن' },
+            { image: 'kuwait.jpg', name: 'الكويت' },
+            { image: 'lebanon.jpg', name: 'لبنان' },
+            { image: 'oman.jpg', name: 'عمان' },
+            { image: 'qatar.jpg', name: 'قطر' },
+            { image: 'syria.jpg', name: 'سوريا' },
+            { image: 'yemen.jpg', name: 'اليمن' },
+            { image: 'bahrain.jpg', name: 'البحرين' },
+            { image: 'palestine.jpg', name: 'فلسطين' },
+            { image: 'morocco.jpg', name: 'المغرب' },
+            { image: 'algeria.jpg', name: 'الجزائر' },
+            { image: 'tunisia.jpg', name: 'تونس' },
+            { image: 'libya.jpg', name: 'ليبيا' },
+            { image: 'sudan.jpg', name: 'السودان' },
+            { image: 'somalia.jpg', name: 'الصومال' },
+            { image: 'djibouti.jpg', name: 'جيبوتي' },
+            { image: 'usa.jpg', name: 'أمريكا' },
+            { image: 'uk.jpg', name: 'بريطانيا' },
+            { image: 'france.jpg', name: 'فرنسا' },
+            { image: 'germany.jpg', name: 'ألمانيا' },
+            { image: 'italy.jpg', name: 'إيطاليا' },
+            { image: 'spain.jpg', name: 'إسبانيا' },
+            { image: 'portugal.jpg', name: 'البرتغال' },
+            { image: 'russia.jpg', name: 'روسيا' },
+            { image: 'china.jpg', name: 'الصين' },
+            { image: 'japan.jpg', name: 'اليابان' },
+            { image: 'south-korea.jpg', name: 'كوريا الجنوبية' },
+            { image: 'india.jpg', name: 'الهند' },
+            { image: 'pakistan.jpg', name: 'باكستان' },
+            { image: 'bangladesh.jpg', name: 'بنغلاديش' },
+            { image: 'turkey.jpg', name: 'تركيا' },
+            { image: 'iran.jpg', name: 'إيران' },
+            { image: 'indonesia.jpg', name: 'اندونيسيا' },
+            { image: 'brazil.jpg', name: 'البرازيل' },
+            { image: 'argentina.jpg', name: 'الأرجنتين' },
+            { image: 'mexico.jpg', name: 'المكسيك' },
+            { image: 'canada.jpg', name: 'كندا' },
+            { image: 'australia.jpg', name: 'أستراليا' },
+            { image: 'new-zealand.jpg', name: 'نيوزيلندا' },
+            { image: 'south-africa.jpg', name: 'جنوب أفريقيا' },
+            { image: 'nigeria.jpg', name: 'نيجيريا' },
+            { image: 'kenya.jpg', name: 'كينيا' },
+            { image: 'ethiopia.jpg', name: 'إثيوبيا' },
+            { image: 'ghana.jpg', name: 'غانا' },
+            { image: 'sweden.jpg', name: 'السويد' },
+            { image: 'norway.jpg', name: 'النرويج' }
+        ];
+
+        let scores = { team1: 0, team2: 0 };
+        let currentQuestion = null;
+        let answeredQuestions = new Set();
+        let currentAnswer = '';
+
+        function initGame() {
+            const grid = document.getElementById('numbersGrid');
+            for (let i = 1; i <= 50; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'number-btn';
+                btn.textContent = i;
+                btn.onclick = () => showQuestion(i);
+                btn.id = `btn-${i}`;
+                grid.appendChild(btn);
+            }
+        }
+
+        function showQuestion(num) {
+            if (answeredQuestions.has(num)) return;
+            
+            currentQuestion = num;
+            currentAnswer = flags[num - 1].name;
+            
+            // إخفاء الشاشة الرئيسية
+            document.getElementById('numbersGrid').style.display = 'none';
+            document.getElementById('answerArea').classList.remove('active');
+            
+            // عرض شاشة السؤال
+            document.getElementById('questionArea').classList.add('active');
+            document.getElementById('questionNumber').textContent = num;
+            document.getElementById('flagDisplay').innerHTML = `<img src="${flags[num - 1].image}" alt="${flags[num - 1].name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;" onerror="this.src=''; this.alt='صورة العلم غير متوفرة'; this.style.display='none';">`;
+        }
+
+        function showAnswer() {
+            // إخفاء شاشة السؤال
+            document.getElementById('questionArea').classList.remove('active');
+            
+            // عرض شاشة الإجابة
+            document.getElementById('answerArea').classList.add('active');
+            document.getElementById('answerQuestionNumber').textContent = currentQuestion;
+            document.getElementById('answerFlagDisplay').innerHTML = `<img src="${flags[currentQuestion - 1].image}" alt="${flags[currentQuestion - 1].name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;" onerror="this.src=''; this.alt='صورة العلم غير متوفرة'; this.style.display='none';">`;
+            document.getElementById('answerText').textContent = currentAnswer;
+            document.getElementById('successMessage').classList.remove('show');
+        }
+
+        function givePointToTeam(team) {
+            // إضافة النقطة
+            scores[`team${team}`]++;
+            document.getElementById(`score${team}`).textContent = scores[`team${team}`];
+            
+            // عرض رسالة النجاح
+            const successMsg = document.getElementById('successMessage');
+            successMsg.textContent = '🎉 نقطة للفريق ' + (team === 1 ? 'الأول' : 'الثاني') + '!';
+            successMsg.classList.add('show');
+            
+            // تمييز السؤال كمجاب عليه
+            answeredQuestions.add(currentQuestion);
+            document.getElementById(`btn-${currentQuestion}`).classList.add('answered');
+            
+            // العودة للشاشة الرئيسية بعد ثانيتين
+            setTimeout(() => {
+                backToGrid();
+            }, 2000);
+        }
+
+        function backToGrid() {
+            // إخفاء جميع الشاشات
+            document.getElementById('questionArea').classList.remove('active');
+            document.getElementById('answerArea').classList.remove('active');
+            
+            // عرض الشاشة الرئيسية
+            document.getElementById('numbersGrid').style.display = 'grid';
+            
+            // إعادة تعيين المتغيرات
+            currentQuestion = null;
+            currentAnswer = '';
+        }
+
+        initGame();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9954a3bf22c7788a',t:'MTc2MTU5Mzc1OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
